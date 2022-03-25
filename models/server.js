@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors');
+const {dbConnection} = require('../database/config');
 const {isMutant} = require('../mutant');
 
 
@@ -7,6 +8,7 @@ class Server{
     constructor(){
         this.app = express();
         this.port = process.env.PORT;
+        this.connectDB();
         this.middlewares();
         this.routes();
     }
@@ -25,6 +27,10 @@ class Server{
                 res.status(400).json({dna: req.body.dna, isValid : false});
             }
           })
+    }
+
+    async connectDB(){
+        await dbConnection();
     }
 
     middlewares(){
