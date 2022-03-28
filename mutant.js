@@ -6,15 +6,18 @@ const isMutant = (dna) => {
 
     //validacion NxN / Validacion de caracteres
     if(dna == null){
+        console.log("El dna es null.");
         throw new Error("El dna es null.");
     }
 
     for(let i = 0; i <  dna.length; i++){
         if(dna[i].length !=  dna.length){
+            console.log("La secuencia no es de NxN");
             throw new Error("La secuencia no es de NxN");
         }
         for(let j = 0; j <  dna.length; j++){
             if(!isValidCharacter(dna[i][j])){
+                console.log('No es una secuencia válida.');
                 throw new Error('No es una secuencia válida.');
             }
         }
