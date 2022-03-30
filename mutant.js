@@ -1,5 +1,5 @@
 const isMutant = (dna) => {
-    console.log(dna);
+    //console.log(dna);
     const length = dna.length;
     let matrix = new Array(length*6);
     let rowMatrixIndex = 0;
