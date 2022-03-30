@@ -15,24 +15,13 @@ const dbConnectionTest = async () => {
     await server.dbo.close();
   };
 
-/*
-describe('GET /tasks', () => {
-    beforeAll(dbConnectionTest);
-    afterAll(dbConnectionClose);
-    
-    test('Should responde a status code 200',async()=>{
-        const response = await request(server.getApp()).get('/tasks');
-        expect(response.statusCode).toBe(404);
-    })
-})
-*/
 
 describe('GET /stats', () => {
     beforeAll(dbConnectionTest);
     afterAll(dbConnectionClose);
 
     test('Should responde a status code 200',async()=>{
-        const response = await request(server.getApp()).get('/stats').set('Accept', 'application/json');
+        const response = await request(server.app).get('/stats').set('Accept', 'application/json');
         expect(response.statusCode).toBe(200);
     })
 })
@@ -43,7 +32,7 @@ describe('POST /mutant {isMutant: true}', () => {
 
     test('Should responde a status code 200',async()=>{
         const dna = {"dna": ["ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"]};
-        const response = await request(server.getApp()).post('/mutant')
+        const response = await request(server.app).post('/mutant')
         .set('Accept', 'application/json')
         .send(dna);
         
@@ -60,13 +49,45 @@ describe('POST /mutant {isMutant: false}', () => {
     afterAll(dbConnectionClose);
     test('Should responde a status code 403',async()=>{
         const dna ={"dna":["TTGCGA","CAGTGC","TTATGT","AGAAGG","ACCCTA","TCACTG"]};
-        const response = await request(server.getApp()).post('/mutant')
+        const response = await request(server.app).post('/mutant')
         .set('Accept', 'application/json')
         .send(dna);
         expect(response.header['content-type']).toBe('application/json; charset=utf-8');
         expect(response.statusCode).toBe(403);
         expect(response => {
             assert(response.body.isMutant, false)
+        });
+    })
+})
+
+describe('POST /mutant {isValid: false} - Contiene una Z', () => {
+    beforeAll(dbConnectionTest);
+    afterAll(dbConnectionClose);
+    test('Should responde a status code 400',async()=>{
+        const dna ={"dna":["ZTGCGA","CAGTGC","TTATGT","AGAAGG","ACCCTA","TCACTG"]};
+        const response = await request(server.app).post('/mutant')
+        .set('Accept', 'application/json')
+        .send(dna);
+        expect(response.header['content-type']).toBe('application/json; charset=utf-8');
+        expect(response.statusCode).toBe(400);
+        expect(response => {
+            assert(response.body.isValid, false)
+        });
+    })
+})
+
+describe('POST /mutant {isValid: false} - No es de NxN', () => {
+    beforeAll(dbConnectionTest);
+    afterAll(dbConnectionClose);
+    test('Should responde a status code 400',async()=>{
+        const dna ={"dna":["TGCGA","CAGTGC","TTATGT","AGAAGG","ACCCTA","TCACTG"]};
+        const response = await request(server.app).post('/mutant')
+        .set('Accept', 'application/json')
+        .send(dna);
+        expect(response.header['content-type']).toBe('application/json; charset=utf-8');
+        expect(response.statusCode).toBe(400);
+        expect(response => {
+            assert(response.body.isValid, false)
         });
     })
 })

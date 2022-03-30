@@ -1,27 +1,27 @@
+const dnaIsValid = (dna, callback) =>{
+    //validacion NxN 
+    if(dna == null){
+        return callback(false, "El dna es null.");
+    }
+    // Validacion de caracteres
+    for(let i = 0; i <  dna.length; i++){
+        if(dna[i].length !=  dna.length){
+            return callback(false, "La secuencia no es de NxN");
+        }
+        for(let j = 0; j <  dna.length; j++){
+            if(!isValidCharacter(dna[i][j])){
+                return callback(false, 'No es una secuencia válida.');
+            }
+        }
+    }
+    return callback(true, 'Es una secuencia valida.')
+};
+
 const isMutant = (dna) => {
     //console.log(dna);
     const length = dna.length;
     let matrix = new Array(length*6);
     let rowMatrixIndex = 0;
-
-    //validacion NxN / Validacion de caracteres
-    if(dna == null){
-        console.log("El dna es null.");
-        throw new Error("El dna es null.");
-    }
-
-    for(let i = 0; i <  dna.length; i++){
-        if(dna[i].length !=  dna.length){
-            console.log("La secuencia no es de NxN");
-            throw new Error("La secuencia no es de NxN");
-        }
-        for(let j = 0; j <  dna.length; j++){
-            if(!isValidCharacter(dna[i][j])){
-                console.log('No es una secuencia válida.');
-                throw new Error('No es una secuencia válida.');
-            }
-        }
-    }
 
     //Inicializacion de matriz
     for(let i = 0; i < matrix.length; i++){
@@ -91,4 +91,4 @@ const isValidCharacter = (character) => {
     return(character === 'A' || character === 'T' || character === 'C' || character === 'G');
 }
 
-module.exports = {isMutant}
+module.exports = {isMutant, dnaIsValid}

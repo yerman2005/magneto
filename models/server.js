@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express')
 const cors = require('cors');
 const {dbConnection} = require('../models/config');
-const {isMutant} = require('../mutant');
+const {isMutant, dnaIsValid} = require('../mutant');
 
 class Server{
      constructor(){
@@ -19,18 +19,24 @@ class Server{
     routes(){
         this.app.post('/mutant', (req, res) => {
             try{
-                const result = isMutant(req.body.dna);
-                const data = { dna: req.body.dna, isMutant : result};
-
-                this.dbo.db("magnetoDB").collection("dnas").insertOne(data, (err, resDB) =>{
-                    if (err) throw err;
-                    //db.close();
-                    if(result == true){
-                        res.status(200).json(data);
-                    }else{
-                        res.status(403).json(data);
-                    }        
+                const dataIsValid = dnaIsValid(req.body.dna, (response, reject)=>{
+                    return { dna: req.body.dna, isValid : response, msg : reject};
                 });
+                if(dataIsValid.isValid){
+                    const result = isMutant(req.body.dna);
+                    const data = { dna: req.body.dna, isMutant : result};
+    
+                    this.dbo.db("magnetoDB").collection("dnas").insertOne(data, (err, resDB) =>{
+                        if (err) throw err;
+                        if(result == true){
+                            res.status(200).json(data);
+                        }else{
+                            res.status(403).json(data);
+                        }        
+                    });    
+                }else{
+                    res.status(400).json(dataIsValid);
+                }
             }catch(e){
                 res.status(500).json({error: e.message});
             }
@@ -51,10 +57,6 @@ class Server{
         });
     }
 
-    connectDB(){
-        return dbConnection();
-    }
-
     middlewares(){
         this.app.use(cors());
         this.app.use(express.json());
@@ -64,10 +66,6 @@ class Server{
         this.app.listen(process.env.PORT, ()=>{
             console.log("Servidor corriendo en el puerto", this.port);
         });
-    }
-
-    getApp(){
-        return this.app;
     }
 }
 
